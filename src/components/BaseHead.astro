@@ -51,7 +51,7 @@ if (article?.cover) {
     height: 630,
   });
 } else {
-  const importedOgImage = await import(`../assets/og-image.png`).then(
+  const importedOgImage = await import(`../assets/og-image.jpg`).then(
     (m) => m.default
   );
   openGraphImage = await getImage({
