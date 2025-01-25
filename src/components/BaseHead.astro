@@ -25,15 +25,16 @@ interface Props {
   };
 }
 
+// Ensure that Astro.props is destructured properly
 const {
-  title,
-  description,
+  title = SITE_METADATA.title,
+  description = SITE_METADATA.description,
   robots = SITE_METADATA.robots,
   article,
   titleTemplate,
 } = Astro.props;
 
-// The default author is the site creator
+// Fetch the default author
 const creator = await getEntry("authors", "default");
 
 // Optimize favicon and touch icons
@@ -61,14 +62,15 @@ if (article?.cover) {
   });
 }
 
-const twitterCreator = article?.authorTwitter || creator.data.twitter;
+const twitterCreator =
+  article?.authorTwitter || creator?.data?.twitter || SITE_METADATA.twitter;
 const isProduction = import.meta.env.PROD;
 ---
 
 <head>
   <SEO
     title={title}
-    {titleTemplate}
+    titleTemplate={titleTemplate}
     titleDefault={SITE_METADATA.title}
     description={description}
     nofollow={robots.includes("nofollow")}
@@ -92,22 +94,18 @@ const isProduction = import.meta.env.PROD;
       link: [
         { rel: "icon", type: `image/svg`, href: favicon.src },
         { rel: "apple-touch-icon", sizes: "76x76", href: appleTouchIcon.src },
-        { rel: "icon", type: "image/svg", sizes: "32x32", href: favicon32.src },
-        { rel: "icon", type: "image/svg", sizes: "16x16", href: favicon16.src },
+        { rel: "icon", type: "image/png", sizes: "32x32", href: favicon32.src },
+        { rel: "icon", type: "image/png", sizes: "16x16", href: favicon16.src },
         { rel: "mask-icon", href: favicon16.src, color: "black" },
         { rel: "alternate", type: "application/rss+xml", href: "/rss.xml" },
       ],
     }}
     twitter={{
-      ...((twitterCreator && {
-        card: "summary_large_image",
-        // site: creator.data.twitter,
-        creator: twitterCreator.replace("https://twitter.com/", "@"),
-        title,
-        description,
-        image: openGraphImage.src,
-      }) ||
-        {}),
+      card: "summary_large_image",
+      creator: twitterCreator.replace("https://twitter.com/", "@"),
+      title,
+      description,
+      image: openGraphImage.src,
     }}
     openGraph={{
       basic: {
